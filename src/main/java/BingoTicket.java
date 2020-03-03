@@ -18,10 +18,6 @@ public class BingoTicket {
         return numbers;
     }
 
-    private void addNumber(int row, int column, int number) {
-        numbers[row][column] = number;
-    }
-
     private int numbersInRow(int row) {
         return (int) Arrays.stream(numbers[row])
                 .filter(number -> number != 0)
@@ -33,23 +29,18 @@ public class BingoTicket {
             Iterator<Integer> valuesIterator = columnToNumbers.get(column).iterator();
 
             List<Integer> integerList = IntStream.range(0, ROWS).boxed()
-                    .sorted(this::randomComparator)
-                    .sorted(this::rowNumbersComparator)
+                    .sorted(rowNumbersComparator())
                     .collect(Collectors.toList());
 
             Iterator<Integer> rowIndexIterator = integerList.iterator();
 
             while (valuesIterator.hasNext()) {
-                addNumber(rowIndexIterator.next(), column, valuesIterator.next());
+                numbers[rowIndexIterator.next()][column] = valuesIterator.next();
             }
         }
     }
 
-    private int rowNumbersComparator(Integer rowOne, Integer rowTwo) {
-        return Comparator.comparing(this::numbersInRow).compare(rowOne, rowTwo);
-    }
-
-    private int randomComparator(Integer rowOne, Integer rowTwo) {
-        return Comparator.comparing(i -> new Random().nextInt()).compare(rowOne, rowTwo);
+    private Comparator<Integer> rowNumbersComparator() {
+        return Comparator.comparing(this::numbersInRow).thenComparing(i -> new Random().nextInt());
     }
 }
